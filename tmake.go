@@ -45,7 +45,7 @@ func doMake(cmdlines []string) {
 }
 
 type alias struct {
-	long  string
+	normal  string
 	short string
 }
 
@@ -59,7 +59,10 @@ var allStuffSequence = []alias{
 	{"os", "o"},      //make os
 }
 
-const buildX86 = "BUILD_FOR=TSERIES_X86_"
+const (
+	makecmd = "make -j"
+	buildX86 = "BUILD_FOR=TSERIES_X86_"
+)
 
 func getCmdlines(args []string, x86 bool) (cmdlines []string) {
 	//default: make
@@ -69,10 +72,10 @@ func getCmdlines(args []string, x86 bool) (cmdlines []string) {
 	cmdlines = make([]string, 0, len(args))
 	for _, stuff := range allStuffSequence {
 		for _, arg := range args {
-			if arg == stuff.long || arg == stuff.short {
-				cmdline := "make " + stuff.long
+			if arg == stuff.normal || arg == stuff.short {
+				cmdline := makecmd + stuff.normal
+				//add build x86 flag
 				if x86 {
-					//add build x86 flag
 					cmdline += buildX86
 				}
 				cmdlines = append(cmdlines, cmdline)
