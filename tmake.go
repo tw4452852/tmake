@@ -53,7 +53,7 @@ type alias struct {
 var allStuffSequence = []alias{
 	{"clean", "c"},   //make clean
 	{"prepare", "p"}, //make prepare
-	{"tw_mk", ""},    //make
+	{"tw_mk ", ""},   //make
 	{"strip", "s"},   //make strip
 	{"install", "i"}, //make install
 	{"os", "o"},      //make os
