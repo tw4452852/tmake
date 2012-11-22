@@ -6,16 +6,16 @@ import (
 
 var tests = []struct {
 	cmd string
-	err	string
+	err string
 }{
-	{"echo hello",	""},
-	{"ls /",		""},
-	{"",			"cmdline is null"},
+	{"echo hello", ""},
+	{"ls ", ""},
+	{"", "cmdline is null"},
 }
 
 func TestEntry(t *testing.T) {
 	for _, test := range tests {
-		exec , err := NewEntry(test.cmd)
+		exec, err := NewEntry(test.cmd)
 		if err != nil {
 			if errString(err) != test.err {
 				t.Errorf("%q test failed: result=%q, expected=%q\n", test.cmd, err.Error(), test.err)

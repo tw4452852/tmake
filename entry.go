@@ -3,20 +3,19 @@
 package main
 
 import (
-	"os/exec"
 	"bytes"
 	"fmt"
-	"strings"
-	"log"
-	"regexp"
 	"io"
+	"log"
+	"os/exec"
+	"strings"
 )
 
 type entry struct {
-	procName	string			//program name
-	procArgs	string			//program args
-	exitCode	error			//exit error if has
-	errBuffer	*bytes.Buffer	//save error info
+	procName  string        //program name
+	procArgs  []string      //program args
+	exitCode  error         //exit error if has
+	errBuffer *bytes.Buffer //save error info
 }
 
 func NewEntry(cmd string) (*entry, error) {
@@ -25,9 +24,9 @@ func NewEntry(cmd string) (*entry, error) {
 		return nil, fmt.Errorf("cmdline is null")
 	}
 	procName := fields[0]
-	var procArgs string
+	var procArgs []string
 	if len(fields) > 1 {
-		procArgs = strings.Join(fields[1:], " ")
+		procArgs = fields[1:]
 	}
 	return &entry{
 		procName: procName,
@@ -40,9 +39,6 @@ func (e *entry) ExitCode() error {
 }
 
 func (e *entry) ErrString() string {
-	if e.errBuffer == nil {
-		return ""
-	}
 	return e.errBuffer.String()
 }
 
@@ -52,7 +48,7 @@ func (e *entry) Run() error {
 		return fmt.Errorf("cmdline is null")
 	}
 
-	cmd := exec.Command(e.procName, e.procArgs)
+	cmd := exec.Command(e.procName, e.procArgs...)
 	allOut := new(bytes.Buffer)
 	//let all output to one buffer
 	cmd.Stdout = allOut
@@ -68,10 +64,7 @@ func (e *entry) Run() error {
 	return e.exitCode
 }
 
-var errPattern = regexp.MustCompile(`(?i:err|fail)`)
-
 func getErrorInfo(errInfo *bytes.Buffer, all *bytes.Buffer) {
-	var prevLine string
 	for {
 		line, err := all.ReadString('\n')
 		if err != nil {
@@ -81,10 +74,7 @@ func getErrorInfo(errInfo *bytes.Buffer, all *bytes.Buffer) {
 			log.Println("parse line err:", err)
 			continue
 		}
-		if errPattern.MatchString(line) {
-			errInfo.WriteString(prevLine)
-			errInfo.WriteString(line)
-		}
-		prevLine = line
+		//TODO:filter errinfo
+		errInfo.WriteString(line)
 	}
 }
